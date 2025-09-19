@@ -5,5 +5,6 @@
 3. Cal.html : Cal All in (JS & CSS dalam HTML)
 
 ---
-*Author: Gh0sT4n*
+*Author : Gh0sT4n*
+*SMKN 5 TAKENGON*
 --
