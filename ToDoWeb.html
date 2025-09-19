@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List Web</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .input-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .priority-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .priority-option {
+            flex: 1;
+            text-align: center;
+        }
+
+        .priority-option input[type="radio"] {
+            display: none;
+        }
+
+        .priority-option label {
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .priority-low label {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .priority-medium label {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+
+        .priority-high label {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .priority-option input[type="radio"]:checked + label {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px currentColor;
+        }
+
+        .datetime-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .datetime-select {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .filter-section {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #2575fc;
+            color: white;
+            border-color: #2575fc;
+        }
+
+        .todo-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .todo-tabs {
+            display: flex;
+            background-color: #f1f1f1;
+        }
+
+        .todo-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .todo-tab.active {
+            background-color: white;
+            color: #2575fc;
+        }
+
+        .todo-content {
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+
+        .todo-checkbox {
+            margin-right: 15px;
+            margin-top: 5px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-content-wrapper {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .todo-description {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .todo-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .todo-priority {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .priority-low {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .priority-medium {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+
+        .priority-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .action-btn:hover {
+            color: #2575fc;
+        }
+
+        .action-btn.delete:hover {
+            color: #e74c3c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .todo-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .todo-item {
+                flex-direction: column;
+            }
+
+            .todo-checkbox {
+                margin-bottom: 10px;
+            }
+
+            .todo-actions {
+                align-self: flex-end;
+                margin-top: 10px;
+            }
+
+            .datetime-container {
+                flex-direction: column;
+            }
+
+            .datetime-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> To-Do List Web</h1>
+            <p>Kelola tugas harian Anda dengan mudah</p>
+        </header>
+
+        <section class="input-section">
+            <h2>Tambah Tugas Baru</h2>
+            <form id="todo-form">
+                <div class="form-group">
+                    <label for="todo-title">Judul Tugas</label>
+                    <input type="text" id="todo-title" placeholder="Masukkan judul tugas" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="todo-description">Deskripsi</label>
+                    <textarea id="todo-description" placeholder="Masukkan deskripsi tugas (opsional)"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Level Penting</label>
+                    <div class="priority-container">
+                        <div class="priority-option priority-low">
+                            <input type="radio" id="priority-low" name="priority" value="low" checked>
+                            <label for="priority-low">Low</label>
+                        </div>
+                        <div class="priority-option priority-medium">
+                            <input type="radio" id="priority-medium" name="priority" value="medium">
+                            <label for="priority-medium">Medium</label>
+                        </div>
+                        <div class="priority-option priority-high">
+                            <input type="radio" id="priority-high" name="priority" value="high">
+                            <label for="priority-high">High</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Target Tanggal & Waktu</label>
+                    <div class="datetime-container">
+                        <select id="todo-day" class="datetime-select"></select>
+                        <select id="todo-month" class="datetime-select"></select>
+                        <select id="todo-year" class="datetime-select"></select>
+                        <select id="todo-hour" class="datetime-select"></select>
+                        <select id="todo-minute" class="datetime-select"></select>
+                        <select id="todo-timezone" class="datetime-select">
+                            <option value="WIB">WIB</option>
+                            <option value="WITA">WITA</option>
+                            <option value="WIT">WIT</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-plus"></i> Tambah Tugas
+                </button>
+            </form>
+        </section>
+
+        <section class="filter-section">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <button class="filter-btn" data-filter="high">High</button>
+                <button class="filter-btn" data-filter="medium">Medium</button>
+                <button class="filter-btn" data-filter="low">Low</button>
+            </div>
+            
+            <div class="action-buttons">
+                <div class="file-input-wrapper">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-file-import"></i> Import JSON
+                    </button>
+                    <input type="file" id="import-json" accept=".json">
+                </div>
+                <button class="btn btn-secondary" id="export-json">
+                    <i class="fas fa-file-export"></i> Export JSON
+                </button>
+            </div>
+        </section>
+
+        <section class="todo-container">
+            <div class="todo-tabs">
+                <div class="todo-tab active" data-tab="pending">
+                    <i class="fas fa-clock"></i> Belum Dikerjakan
+                </div>
+                <div class="todo-tab" data-tab="completed">
+                    <i class="fas fa-check-circle"></i> Sudah Dikerjakan
+                </div>
+            </div>
+            
+            <div class="todo-content">
+                <div id="pending-todos" class="todo-tab-content">
+                    <ul class="todo-list" id="pending-list">
+                        <!-- Pending todos will be added here dynamically -->
+                    </ul>
+                    <div class="empty-state" id="pending-empty">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Tidak ada tugas yang belum dikerjakan</p>
+                    </div>
+                </div>
+                
+                <div id="completed-todos" class="todo-tab-content" style="display: none;">
+                    <ul class="todo-list" id="completed-list">
+                        <!-- Completed todos will be added here dynamically -->
+                    </ul>
+                    <div class="empty-state" id="completed-empty">
+                        <i class="fas fa-check-double"></i>
+                        <p>Tidak ada tugas yang sudah dikerjakan</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Tugas</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-title">Judul Tugas</label>
+                    <input type="text" id="edit-title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-description">Deskripsi</label>
+                    <textarea id="edit-description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Level Penting</label>
+                    <div class="priority-container">
+                        <div class="priority-option priority-low">
+                            <input type="radio" id="edit-priority-low" name="edit-priority" value="low">
+                            <label for="edit-priority-low">Low</label>
+                        </div>
+                        <div class="priority-option priority-medium">
+                            <input type="radio" id="edit-priority-medium" name="edit-priority" value="medium">
+                            <label for="edit-priority-medium">Medium</label>
+                        </div>
+                        <div class="priority-option priority-high">
+                            <input type="radio" id="edit-priority-high" name="edit-priority" value="high">
+                            <label for="edit-priority-high">High</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Target Tanggal & Waktu</label>
+                    <div class="datetime-container">
+                        <select id="edit-day" class="datetime-select"></select>
+                        <select id="edit-month" class="datetime-select"></select>
+                        <select id="edit-year" class="datetime-select"></select>
+                        <select id="edit-hour" class="datetime-select"></select>
+                        <select id="edit-minute" class="datetime-select"></select>
+                        <select id="edit-timezone" class="datetime-select">
+                            <option value="WIB">WIB</option>
+                            <option value="WITA">WITA</option>
+                            <option value="WIT">WIT</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+            let currentFilter = 'all';
+            let currentTab = 'pending';
+            
+            // DOM elements
+            const todoForm = document.getElementById('todo-form');
+            const todoTitle = document.getElementById('todo-title');
+            const todoDescription = document.getElementById('todo-description');
+            const pendingList = document.getElementById('pending-list');
+            const completedList = document.getElementById('completed-list');
+            const pendingEmpty = document.getElementById('pending-empty');
+            const completedEmpty = document.getElementById('completed-empty');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const todoTabs = document.querySelectorAll('.todo-tab');
+            const exportBtn = document.getElementById('export-json');
+            const importInput = document.getElementById('import-json');
+            const editModal = document.getElementById('edit-modal');
+            const editForm = document.getElementById('edit-form');
+            const closeModalBtn = document.getElementById('close-modal');
+            const notification = document.getElementById('notification');
+            
+            // Event listeners
+            todoForm.addEventListener('submit', addTodo);
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => setFilter(button.dataset.filter));
+            });
+            todoTabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+            exportBtn.addEventListener('click', exportToJson);
+            importInput.addEventListener('change', importFromJson);
+            editForm.addEventListener('submit', updateTodo);
+            closeModalBtn.addEventListener('click', closeEditModal);
+            
+            // Initialize datetime options
+            populateDateTimeOptions();
+            setDefaultDateTime();
+            
+            // Initialize the app
+            renderTodos();
+            
+            // Functions
+            function populateDateTimeOptions() {
+                // Populate day options (1-31)
+                const daySelects = document.querySelectorAll('[id$="-day"]');
+                daySelects.forEach(select => {
+                    for (let i = 1; i <= 31; i++) {
+                        const option = document.createElement('option');
+                        option.value = i < 10 ? `0${i}` : i;
+                        option.textContent = i;
+                        select.appendChild(option);
+                    }
+                });
+
+                // Populate month options
+                const monthSelects = document.querySelectorAll('[id$="-month"]');
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                monthSelects.forEach(select => {
+                    months.forEach((month, index) => {
+                        const option = document.createElement('option');
+                        option.value = index + 1 < 10 ? `0${index + 1}` : index + 1;
+                        option.textContent = month;
+                        select.appendChild(option);
+                    });
+                });
+
+                // Populate year options (current year to 10 years ahead)
+                const yearSelects = document.querySelectorAll('[id$="-year"]');
+                const currentYear = new Date().getFullYear();
+                yearSelects.forEach(select => {
+                    for (let i = currentYear; i <= currentYear + 10; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i;
+                        select.appendChild(option);
+                    }
+                });
+
+                // Populate hour options (0-23)
+                const hourSelects = document.querySelectorAll('[id$="-hour"]');
+                hourSelects.forEach(select => {
+                    for (let i = 0; i < 24; i++) {
+                        const option = document.createElement('option');
+                        option.value = i < 10 ? `0${i}` : i;
+                        option.textContent = i < 10 ? `0${i}` : i;
+                        select.appendChild(option);
+                    }
+                });
+
+                // Populate minute options (0-59)
+                const minuteSelects = document.querySelectorAll('[id$="-minute"]');
+                minuteSelects.forEach(select => {
+                    for (let i = 0; i < 60; i++) {
+                        const option = document.createElement('option');
+                        option.value = i < 10 ? `0${i}` : i;
+                        option.textContent = i < 10 ? `0${i}` : i;
+                        select.appendChild(option);
+                    }
+                });
+            }
+
+            function setDefaultDateTime() {
+                const now = new Date();
+                
+                // Set default values for todo form
+                document.getElementById('todo-day').value = now.getDate() < 10 ? `0${now.getDate()}` : now.getDate();
+                document.getElementById('todo-month').value = (now.getMonth() + 1) < 10 ? `0${now.getMonth() + 1}` : now.getMonth() + 1;
+                document.getElementById('todo-year').value = now.getFullYear();
+                document.getElementById('todo-hour').value = now.getHours() < 10 ? `0${now.getHours()}` : now.getHours();
+                document.getElementById('todo-minute').value = now.getMinutes() < 10 ? `0${now.getMinutes()}` : now.getMinutes();
+            }
+
+            function getDateTimeFromSelects(prefix) {
+                const day = document.getElementById(`${prefix}-day`).value;
+                const month = document.getElementById(`${prefix}-month`).value;
+                const year = document.getElementById(`${prefix}-year`).value;
+                const hour = document.getElementById(`${prefix}-hour`).value;
+                const minute = document.getElementById(`${prefix}-minute`).value;
+                const timezone = document.getElementById(`${prefix}-timezone`).value;
+                
+                // Create date string in ISO format (YYYY-MM-DDTHH:mm)
+                const dateStr = `${year}-${month}-${day}T${hour}:${minute}`;
+                
+                // Adjust for timezone
+                let offset = 0;
+                if (timezone === 'WITA') offset = 1; // UTC+8
+                else if (timezone === 'WIT') offset = 2; // UTC+9
+                // WIB is UTC+7, no adjustment needed
+                
+                const date = new Date(dateStr);
+                date.setHours(date.getHours() - offset);
+                
+                return date.toISOString() + ` ${timezone}`;
+            }
+
+            function setDateTimeFromISO(prefix, isoString) {
+                if (!isoString) return;
+                
+                // Extract timezone from the string
+                const timezoneMatch = isoString.match(/(WIB|WITA|WIT)/);
+                const timezone = timezoneMatch ? timezoneMatch[1] : 'WIB';
+                
+                // Extract date part (remove timezone and convert to Date object)
+                const dateStr = isoString.replace(/ (WIB|WITA|WIT)/, '');
+                const date = new Date(dateStr);
+                
+                // Adjust for timezone
+                let offset = 0;
+                if (timezone === 'WITA') offset = 1; // UTC+8
+                else if (timezone === 'WIT') offset = 2; // UTC+9
+                // WIB is UTC+7, no adjustment needed
+                
+                date.setHours(date.getHours() + offset);
+                
+                // Set the values
+                document.getElementById(`${prefix}-timezone`).value = timezone;
+                document.getElementById(`${prefix}-day`).value = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+                document.getElementById(`${prefix}-month`).value = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+                document.getElementById(`${prefix}-year`).value = date.getFullYear();
+                document.getElementById(`${prefix}-hour`).value = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+                document.getElementById(`${prefix}-minute`).value = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+            }
+            
+            function addTodo(e) {
+                e.preventDefault();
+                
+                const title = todoTitle.value.trim();
+                const description = todoDescription.value.trim();
+                const priority = document.querySelector('input[name="priority"]:checked').value;
+                const dueDate = getDateTimeFromSelects('todo');
+                
+                if (!title) {
+                    showNotification('Judul tugas tidak boleh kosong', 'error');
+                    return;
+                }
+                
+                const newTodo = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    priority,
+                    dueDate,
+                    createdAt: new Date().toISOString(),
+                    completed: false
+                };
+                
+                todos.push(newTodo);
+                saveTodos();
+                renderTodos();
+                todoForm.reset();
+                setDefaultDateTime();
+                showNotification('Tugas berhasil ditambahkan');
+            }
+            
+            function toggleTodo(id) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    saveTodos();
+                    renderTodos();
+                    showNotification(todo.completed ? 'Tugas selesai' : 'Tugas dibatalkan');
+                }
+            }
+            
+            function deleteTodo(id) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTodos();
+                showNotification('Tugas berhasil dihapus');
+            }
+            
+            function editTodo(id) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) {
+                    document.getElementById('edit-id').value = todo.id;
+                    document.getElementById('edit-title').value = todo.title;
+                    document.getElementById('edit-description').value = todo.description;
+                    document.getElementById('edit-priority-' + todo.priority).checked = true;
+                    
+                    if (todo.dueDate) {
+                        setDateTimeFromISO('edit', todo.dueDate);
+                    }
+                    
+                    editModal.style.display = 'flex';
+                }
+            }
+            
+            function updateTodo(e) {
+                e.preventDefault();
+                
+                const id = parseInt(document.getElementById('edit-id').value);
+                const title = document.getElementById('edit-title').value.trim();
+                const description = document.getElementById('edit-description').value.trim();
+                const priority = document.querySelector('input[name="edit-priority"]:checked').value;
+                const dueDate = getDateTimeFromSelects('edit');
+                
+                if (!title) {
+                    showNotification('Judul tugas tidak boleh kosong', 'error');
+                    return;
+                }
+                
+                const todoIndex = todos.findIndex(t => t.id === id);
+                if (todoIndex !== -1) {
+                    todos[todoIndex] = {
+                        ...todos[todoIndex],
+                        title,
+                        description,
+                        priority,
+                        dueDate
+                    };
+                    
+                    saveTodos();
+                    renderTodos();
+                    closeEditModal();
+                    showNotification('Tugas berhasil diperbarui');
+                }
+            }
+            
+            function closeEditModal() {
+                editModal.style.display = 'none';
+            }
+            
+            function setFilter(filter) {
+                currentFilter = filter;
+                filterButtons.forEach(button => {
+                    button.classList.toggle('active', button.dataset.filter === filter);
+                });
+                renderTodos();
+            }
+            
+            function switchTab(tab) {
+                currentTab = tab;
+                todoTabs.forEach(t => {
+                    t.classList.toggle('active', t.dataset.tab === tab);
+                });
+                
+                document.getElementById('pending-todos').style.display = tab === 'pending' ? 'block' : 'none';
+                document.getElementById('completed-todos').style.display = tab === 'completed' ? 'block' : 'none';
+                
+                renderTodos();
+            }
+            
+            function renderTodos() {
+                const filteredTodos = currentFilter === 'all' 
+                    ? todos 
+                    : todos.filter(t => t.priority === currentFilter);
+                
+                const pendingTodos = filteredTodos.filter(t => !t.completed);
+                const completedTodos = filteredTodos.filter(t => t.completed);
+                
+                renderTodoList(pendingList, pendingTodos, pendingEmpty);
+                renderTodoList(completedList, completedTodos, completedEmpty);
+            }
+            
+            function renderTodoList(listElement, todos, emptyElement) {
+                listElement.innerHTML = '';
+                
+                if (todos.length === 0) {
+                    emptyElement.style.display = 'block';
+                    return;
+                }
+                
+                emptyElement.style.display = 'none';
+                
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = 'todo-item';
+                    
+                    const priorityClass = `priority-${todo.priority}`;
+                    const priorityText = todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1);
+                    
+                    const createdDate = new Date(todo.createdAt);
+                    const createdDateStr = formatDate(createdDate);
+                    
+                    let dueDateStr = '';
+                    if (todo.dueDate) {
+                        // Extract timezone from the dueDate string if available
+                        const timezoneMatch = todo.dueDate.match(/(WIB|WITA|WIT)/);
+                        const timezone = timezoneMatch ? timezoneMatch[1] : 'WIB';
+                        
+                        // Extract date part (remove timezone)
+                        const dateStr = todo.dueDate.replace(/ (WIB|WITA|WIT)/, '');
+                        const dueDate = new Date(dateStr);
+                        
+                        dueDateStr = `${formatDate(dueDate)} ${timezone}`;
+                    }
+                    
+                    li.innerHTML = `
+                        <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} 
+                               onchange="toggleTodo(${todo.id})">
+                        <div class="todo-content-wrapper">
+                            <div class="todo-title">${escapeHtml(todo.title)}</div>
+                            ${todo.description ? `<div class="todo-description">${escapeHtml(todo.description)}</div>` : ''}
+                            <div class="todo-meta">
+                                <span class="todo-priority ${priorityClass}">${priorityText}</span>
+                                <span><i class="far fa-calendar-plus"></i> Dibuat: ${createdDateStr}</span>
+                                ${dueDateStr ? `<span><i class="far fa-calendar-check"></i> Target: ${dueDateStr}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="todo-actions">
+                            <button class="action-btn" onclick="editTodo(${todo.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteTodo(${todo.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    listElement.appendChild(li);
+                });
+            }
+            
+            function saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(todos));
+            }
+            
+            function exportToJson() {
+                const dataStr = JSON.stringify(todos, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `todo-list-${new Date().toISOString().slice(0, 10)}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                showNotification('Data berhasil diekspor');
+            }
+            
+            function importFromJson(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const importedTodos = JSON.parse(event.target.result);
+                        
+                        if (Array.isArray(importedTodos)) {
+                            todos = importedTodos;
+                            saveTodos();
+                            renderTodos();
+                            showNotification('Data berhasil diimpor');
+                        } else {
+                            showNotification('Format file tidak valid', 'error');
+                        }
+                    } catch (error) {
+                        showNotification('Gagal membaca file', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                e.target.value = ''; // Reset input to allow importing the same file again
+            }
+            
+            function showNotification(message, type = 'success') {
+                notification.textContent = message;
+                notification.className = 'notification';
+                if (type === 'error') {
+                    notification.classList.add('error');
+                }
+                
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            function formatDate(date) {
+                const options = {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('id-ID', options);
+            }
+            
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // Make functions globally accessible
+            window.toggleTodo = toggleTodo;
+            window.deleteTodo = deleteTodo;
+            window.editTodo = editTodo;
+        });
+    </script>
+</body>
+</html>
