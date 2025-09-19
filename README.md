@@ -5,5 +5,5 @@
 3. Cal.html : Cal All in (JS & CSS dalam HTML)
 
 ---
-__Author: Gh0sT4n__
+*Author: Gh0sT4n*
 --
