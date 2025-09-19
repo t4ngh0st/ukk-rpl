@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Scientific Modern</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .calculator-btn {
+            @apply transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95;
+        }
+        
+        .calculator-btn:active {
+            @apply scale-95;
+        }
+        
+        .display-text {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.02em;
+        }
+        
+        .history-item {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .mode-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .mode-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Perbaikan warna tombol - lebih terang */
+        .scientific-btn {
+            @apply bg-gradient-to-br from-purple-400 to-purple-500 text-white hover:from-purple-500 hover:to-purple-600 shadow-md hover:shadow-lg;
+        }
+        
+        .number-btn {
+            @apply bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 hover:from-gray-100 hover:to-gray-200 dark:from-gray-600 dark:to-gray-700 dark:text-white dark:hover:from-gray-500 dark:hover:to-gray-600 shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-600;
+        }
+        
+        .operator-btn {
+            @apply bg-gradient-to-br from-blue-400 to-blue-500 text-white hover:from-blue-500 hover:to-blue-600 shadow-md hover:shadow-lg;
+        }
+        
+        .function-btn {
+            @apply bg-gradient-to-br from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 shadow-md hover:shadow-lg;
+        }
+        
+        .memory-btn {
+            @apply bg-gradient-to-br from-green-400 to-green-500 text-white hover:from-green-500 hover:to-green-600 shadow-md hover:shadow-lg;
+        }
+        
+        .dark-mode {
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        }
+        
+        .light-mode {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        
+        /* Perbaikan tampilan layar kalkulator */
+        .calculator-display {
+            @apply bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-white shadow-inner;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 light-mode transition-all duration-300">
+    <div class="w-full max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Calculator -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 transition-all duration-300">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+                            <i class="fas fa-calculator mr-2 text-blue-500"></i>
+                            Kalkulator Scientific
+                        </h1>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-600 dark:text-gray-300">Scientific</span>
+                            <label class="mode-switch">
+                                <input type="checkbox" id="modeToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button id="themeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-moon dark:hidden text-gray-700"></i>
+                                <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Display - Perbaikan tampilan layar -->
+                    <div class="calculator-display rounded-2xl p-6 mb-6">
+                        <div class="text-right">
+                            <div id="expression" class="text-gray-600 dark:text-gray-400 text-sm mb-2 h-6 display-text"></div>
+                            <div id="display" class="text-4xl font-semibold display-text min-h-[48px] text-gray-900 dark:text-white">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Memory Buttons -->
+                    <div class="grid grid-cols-5 gap-2 mb-4">
+                        <button class="memory-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            MC
+                        </button>
+                        <button class="memory-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            MR
+                        </button>
+                        <button class="memory-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            M+
+                        </button>
+                        <button class="memory-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            M-
+                        </button>
+                        <button class="memory-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            MS
+                        </button>
+                    </div>
+                    
+                    <!-- Scientific Buttons (Hidden by default) -->
+                    <div id="scientificButtons" class="grid grid-cols-5 gap-2 mb-4 hidden">
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            sin
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            cos
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            tan
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            log
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            ln
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            √
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            x^y
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            x²
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            x^
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            1/x
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            π
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            e
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            (
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            )
+                        </button>
+                        <button class="scientific-btn calculator-btn py-3 px-4 rounded-xl text-sm font-medium">
+                            n!
+                        </button>
+                    </div>
+                    
+                    <!-- Main Buttons -->
+                    <div class="grid grid-cols-5 gap-2">
+                        <!-- Row 1 -->
+                        <button class="function-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            C
+                        </button>
+                        <button class="function-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            CE
+                        </button>
+                        <button class="function-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            ⌫
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            ÷
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            ×
+                        </button>
+                        
+                        <!-- Row 2 -->
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            7
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            8
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            9
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            −
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            %
+                        </button>
+                        
+                        <!-- Row 3 -->
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            4
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            5
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            6
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            +
+                        </button>
+                        <button class="operator-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            ±
+                        </button>
+                        
+                        <!-- Row 4 -->
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            1
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            2
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            3
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            .
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            0
+                        </button>
+                        
+                        <!-- Row 5 -->
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            00
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            0
+                        </button>
+                        <button class="number-btn calculator-btn py-4 px-4 rounded-xl text-lg font-medium">
+                            0
+                        </button>
+                        <button class="bg-gradient-to-br from-red-400 to-red-500 text-white hover:from-red-500 hover:to-red-600 calculator-btn py-4 px-4 rounded-xl text-lg font-medium shadow-md hover:shadow-lg">
+                            AC
+                        </button>
+                        <button class="bg-gradient-to-br from-green-400 to-green-500 text-white hover:from-green-500 hover:to-green-600 calculator-btn py-4 px-4 rounded-xl text-lg font-medium shadow-md hover:shadow-lg">
+                            =
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Panel -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-history mr-2 text-purple-500"></i>
+                            Riwayat
+                        </h2>
+                        <button class="text-sm text-red-500 hover:text-red-600 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div id="history" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-8">Belum ada riwayat</p>
+                    </div>
+                </div>
+                
+                <!-- Memory Status -->
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 mt-6 transition-all duration-300">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                        <i class="fas fa-memory mr-2 text-green-500"></i>
+                        Memori
+                    </h2>
+                    <div id="memoryDisplay" class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
+                        <span class="text-gray-500 dark:text-gray-400">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Calculator State
+        let currentInput = '0';
+        let expression = '';
+        let memory = 0;
+        let history = [];
+        let isScientificMode = false;
+        
+        // DOM Elements
+        const display = document.getElementById('display');
+        const expressionDisplay = document.getElementById('expression');
+        const historyContainer = document.getElementById('history');
+        const memoryDisplay = document.getElementById('memoryDisplay');
+        const modeToggle = document.getElementById('modeToggle');
+        const scientificButtons = document.getElementById('scientificButtons');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Mode Toggle
+        modeToggle.addEventListener('change', (e) => {
+            isScientificMode = e.target.checked;
+            if (isScientificMode) {
+                scientificButtons.classList.remove('hidden');
+            } else {
+                scientificButtons.classList.add('hidden');
+            }
+        });
+        
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            document.body.classList.toggle('light-mode');
+            document.body.classList.toggle('dark-mode');
+        });
+        
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') {
+                appendNumber(e.key);
+            } else if (e.key === '.') {
+                appendNumber('.');
+            } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                appendOperator(e.key);
+            } else if (e.key === 'Enter' || e.key === '=') {
+                calculate();
+            } else if (e.key === 'Escape') {
+                clearAll();
+            } else if (e.key === 'Backspace') {
+                deleteLast();
+            }
+        });
+        
+        // Calculator Functions
+        function updateDisplay() {
+            display.textContent = currentInput;
+            expressionDisplay.textContent = expression;
+        }
+        
+        function appendNumber(num) {
+            if (currentInput === '0' && num !== '.') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+        
+        function appendOperator(op) {
+            if (expression && !isOperator(expression.slice(-1))) {
+                expression += ' ' + op + ' ';
+            } else if (!expression) {
+                expression = currentInput + ' ' + op + ' ';
+            } else {
+                expression = expression.slice(0, -2) + op + ' ';
+            }
+            currentInput = '0';
+            updateDisplay();
+        }
+        
+        function appendFunction(func) {
+            expression += func;
+            currentInput = '0';
+            updateDisplay();
+        }
+        
+        function appendConstant(constant) {
+            const value = constant === 'pi' ? Math.PI : Math.E;
+            if (expression && !isOperator(expression.slice(-1))) {
+                expression += ' * ' + value;
+            } else {
+                expression += value;
+            }
+            currentInput = value.toString();
+            updateDisplay();
+        }
+        
+        function isOperator(char) {
+            return ['+', '-', '*', '/', '%', '^'].includes(char);
+        }
+        
+        function clearAll() {
+            currentInput = '0';
+            expression = '';
+            updateDisplay();
+        }
+        
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+        
+        function deleteLast() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+        
+        function toggleSign() {
+            if (currentInput !== '0') {
+                if (currentInput.startsWith('-')) {
+                    currentInput = currentInput.slice(1);
+                } else {
+                    currentInput = '-' + currentInput;
+                }
+                updateDisplay();
+            }
+        }
+        
+        function calculate() {
+            try {
+                let fullExpression = expression + currentInput;
+                
+                // Replace special operators
+                fullExpression = fullExpression.replace(/×/g, '*');
+                fullExpression = fullExpression.replace(/÷/g, '/');
+                fullExpression = fullExpression.replace(/−/g, '-');
+                fullExpression = fullExpression.replace(/\^/g, '**');
+                fullExpression = fullExpression.replace(/pi/g, Math.PI);
+                fullExpression = fullExpression.replace(/e/g, Math.E);
+                
+                // Evaluate functions
+                fullExpression = fullExpression.replace(/sin\(/g, 'Math.sin(');
+                fullExpression = fullExpression.replace(/cos\(/g, 'Math.cos(');
+                fullExpression = fullExpression.replace(/tan\(/g, 'Math.tan(');
+                fullExpression = fullExpression.replace(/log\(/g, 'Math.log10(');
+                fullExpression = fullExpression.replace(/ln\(/g, 'Math.log(');
+                fullExpression = fullExpression.replace(/sqrt\(/g, 'Math.sqrt(');
+                
+                // Handle factorial
+                fullExpression = fullExpression.replace(/(\d+)!/g, (match, num) => {
+                    return factorial(parseInt(num));
+                });
+                
+                const result = eval(fullExpression);
+                
+                // Add to history
+                addToHistory(expression + currentInput, result);
+                
+                currentInput = result.toString();
+                expression = '';
+                updateDisplay();
+            } catch (error) {
+                currentInput = 'Error';
+                updateDisplay();
+                setTimeout(() => {
+                    currentInput = '0';
+                    updateDisplay();
+                }, 1500);
+            }
+        }
+        
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+        
+        // Memory Functions
+        function memoryOperation(operation) {
+            const value = parseFloat(currentInput);
+            
+            switch (operation) {
+                case 'MC':
+                    memory = 0;
+                    break;
+                case 'MR':
+                    currentInput = memory.toString();
+                    updateDisplay();
+                    break;
+                case 'M+':
+                    memory += value;
+                    break;
+                case 'M-':
+                    memory -= value;
+                    break;
+                case 'MS':
+                    memory = value;
+                    break;
+            }
+            
+            updateMemoryDisplay();
+        }
+        
+        function updateMemoryDisplay() {
+            memoryDisplay.innerHTML = `<span class="text-gray-800 dark:text-white font-medium">${memory}</span>`;
+        }
+        
+        // History Functions
+        function addToHistory(expr, result) {
+            history.unshift({
+                expression: expr,
+                result: result
+            });
+            
+            if (history.length > 10) {
+                history.pop();
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            if (history.length === 0) {
+                historyContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-sm text-center py-8">Belum ada riwayat</p>';
+                return;
+            }
+            
+            historyContainer.innerHTML = history.map((item, index) => `
+                <div class="history-item bg-gray-50 dark:bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                    <div class="text-sm text-gray-600 dark:text-gray-300">${item.expression}</div>
+                    <div class="text-lg font-semibold text-gray-800 dark:text-white">= ${item.result}</div>
+                </div>
+            `).join('');
+        }
+        
+        function loadFromHistory(index) {
+            const item = history[index];
+            currentInput = item.result.toString();
+            expression = '';
+            updateDisplay();
+        }
+        
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+        }
+        
+        // Initialize
+        updateDisplay();
+        updateMemoryDisplay();
+        
+        // Add event listeners to all buttons
+        document.querySelectorAll('.calculator-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const text = this.textContent;
+                
+                // Memory buttons
+                if (['MC', 'MR', 'M+', 'M-', 'MS'].includes(text)) {
+                    memoryOperation(text);
+                    return;
+                }
+                
+                // Scientific buttons
+                if (text === 'sin') appendFunction('sin(');
+                else if (text === 'cos') appendFunction('cos(');
+                else if (text === 'tan') appendFunction('tan(');
+                else if (text === 'log') appendFunction('log(');
+                else if (text === 'ln') appendFunction('ln(');
+                else if (text === '√') appendFunction('sqrt(');
+                else if (text === 'x^y') appendOperator('^');
+                else if (text === 'x²') appendOperator('**2');
+                else if (text === 'x^') appendOperator('**');
+                else if (text === '1/x') appendOperator('1/');
+                else if (text === 'π') appendConstant('pi');
+                else if (text === 'e') appendConstant('e');
+                else if (text === '(') appendOperator('(');
+                else if (text === ')') appendOperator(')');
+                else if (text === 'n!') appendOperator('!');
+                
+                // Basic operations
+                else if (text === 'C') clearAll();
+                else if (text === 'CE') clearEntry();
+                else if (text === '⌫') deleteLast();
+                else if (text === 'AC') clearAll();
+                else if (text === '=') calculate();
+                else if (text === '÷') appendOperator('/');
+                else if (text === '×') appendOperator('*');
+                else if (text === '−') appendOperator('-');
+                else if (text === '+') appendOperator('+');
+                else if (text === '%') appendOperator('%');
+                else if (text === '±') toggleSign();
+                
+                // Numbers
+                else if (!isNaN(text) || text === '.') appendNumber(text);
+            });
+        });
+    </script>
+</body>
+</html>
